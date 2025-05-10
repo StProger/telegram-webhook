@@ -85,7 +85,7 @@ def main() -> None:
     # Register startup hook to initialize webhook
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
-    api_server = TelegramAPIServer.from_base('http://172.17.0.1:8081')
+    api_server = TelegramAPIServer.from_base('http://172.17.0.1:8081', is_local=True)
     # Initialize Bot instance with default bot properties which will be passed to all API calls
     bot = Bot(token=TOKEN,
               default=DefaultBotProperties(parse_mode=ParseMode.HTML),
