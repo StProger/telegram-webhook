@@ -6,8 +6,6 @@ import logging
 import sys
 from os import getenv
 
-from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.client.telegram import TelegramAPIServer
 from aiohttp import web
 
 from aiogram import Bot, Dispatcher, Router
@@ -25,7 +23,7 @@ TOKEN = getenv("BOT_TOKEN")
 # bind localhost only to prevent any external access
 WEB_SERVER_HOST = "127.0.0.1"
 # Port for incoming request from reverse proxy. Should be any available port
-WEB_SERVER_PORT = 80
+WEB_SERVER_PORT = 8080
 
 # Path to webhook route, on which Telegram will send requests
 WEBHOOK_PATH = "/webhook"
@@ -72,9 +70,6 @@ async def on_startup(bot: Bot) -> None:
     # certificate to Telegram
     await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}", secret_token=WEBHOOK_SECRET)
 
-async def on_shutdown(bot: Bot):
-    """Tear down app on shutdown."""
-    await bot.session.close()
 
 def main() -> None:
     # Dispatcher is a root router
@@ -84,12 +79,9 @@ def main() -> None:
 
     # Register startup hook to initialize webhook
     dp.startup.register(on_startup)
-    dp.shutdown.register(on_shutdown)
-    api_server = TelegramAPIServer.from_base('http://172.17.0.1:8081', is_local=True)
+
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=TOKEN,
-              default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-              session=AiohttpSession(api=api_server))
+    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
     # Create aiohttp.web.Application instance
     app = web.Application()
