@@ -17,7 +17,8 @@ services:
         condition: service_started
     env_file:
       - .env
-
+    ports:
+      - "8080:8080"
 volumes:
   telegram-bot-api-data:
     driver: "local"
