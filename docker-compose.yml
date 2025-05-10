@@ -1,0 +1,23 @@
+
+services:
+  api:
+    image: nginx:1.21-alpine
+    restart: on-failure
+
+    volumes:
+      - telegram-bot-api-data:/var/lib/telegram-bot-api
+      - ./nginx:/etc/nginx/conf.d/
+
+  bot:
+    build:
+      context: .
+    stop_signal: SIGINT
+    depends_on:
+      api:
+        condition: service_started
+    env_file:
+      - .env
+
+volumes:
+  telegram-bot-api-data:
+    driver: "local"
