@@ -70,6 +70,7 @@ async def echo_handler(message: Message) -> None:
 async def on_startup(bot: Bot) -> None:
     # If you have a self-signed SSL certificate, then you will need to send a public
     # certificate to Telegram
+    await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}", secret_token=WEBHOOK_SECRET)
 
 
