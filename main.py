@@ -6,6 +6,8 @@ import logging
 import sys
 from os import getenv
 
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 from aiohttp import web
 
 from aiogram import Bot, Dispatcher, Router
@@ -31,7 +33,7 @@ WEBHOOK_PATH = "/webhook"
 WEBHOOK_SECRET = "my-secret"
 # Base URL for webhook will be used to generate webhook URL for Telegram,
 # in this example it is used public DNS with HTTPS support
-BASE_WEBHOOK_URL = "http://bot"
+BASE_WEBHOOK_URL = "https://aiogram.dev"
 
 # All handlers should be attached to the Router (or Dispatcher)
 router = Router()
@@ -79,9 +81,11 @@ def main() -> None:
 
     # Register startup hook to initialize webhook
     dp.startup.register(on_startup)
-
+    api = TelegramAPIServer.from_base('http://172.17.0.1:8081', is_local=True)
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    bot = Bot(token=TOKEN,
+              default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+              session=AiohttpSession(api=api))
 
     # Create aiohttp.web.Application instance
     app = web.Application()
